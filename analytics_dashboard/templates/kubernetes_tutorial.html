@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h1>Kubernetes Tutorial</h1>
+  <p>Learn how to deploy and manage applications with Kubernetes.</p>
+  <h2>What is Kubernetes?</h2>
+  <p>Kubernetes is an open-source platform for automating deployment, scaling, and management of containerized applications.</p>
+  <h2>Basic Concepts</h2>
+  <ul>
+    <li><strong>Pod:</strong> The smallest deployable unit in Kubernetes.</li>
+    <li><strong>Service:</strong> Exposes a set of pods as a network service.</li>
+    <li><strong>Deployment:</strong> Manages stateless applications.</li>
+    <li><strong>StatefulSet:</strong> Manages stateful applications.</li>
+    <li><strong>ConfigMap & Secret:</strong> Manage configuration and sensitive data.</li>
+  </ul>
+  <h2>Getting Started</h2>
+  <ol>
+    <li>Install Docker and kubectl.</li>
+    <li>Set up a local cluster (e.g., Minikube).</li>
+    <li>Deploy your first application.</li>
+  </ol>
+  <h2>Sample Deployment YAML</h2>
+  <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app
+        image: my-app-image:latest
+        ports:
+        - containerPort: 80
+</code></pre>
+</div>
+{% endblock %}

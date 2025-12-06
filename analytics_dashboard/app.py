@@ -225,6 +225,18 @@ async def numpy_basics(request: Request):
     return templates.TemplateResponse("numpy_basics.html", {"request": request})
 
 
+@app.get("/pricing", response_class=HTMLResponse)
+async def pricing_page(request: Request):
+    """Display the Pricing page."""
+    return templates.TemplateResponse("pricing.html", {"request": request})
+
+
+@app.get("/kubernetes-tutorial", response_class=HTMLResponse)
+async def kubernetes_tutorial_page(request: Request):
+    """Display the Kubernetes Tutorial page."""
+    return templates.TemplateResponse("kubernetes_tutorial.html", {"request": request})
+
+
 # ============== API Routes ==============
 
 
