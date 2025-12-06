@@ -64,7 +64,7 @@ jobs:
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: "AnalyticsDash" # match your Azure App Service name
+          app-name: "AnalyticsDashboard" # match your Azure App Service name
           slot-name: "Production"
           startup-command: "./startup.sh"
           # Ensure the startup script is executable
