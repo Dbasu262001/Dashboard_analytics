@@ -8,3 +8,4 @@ aiofiles>=23.2.1
 gunicorn>=21.2.0
 
 numpy>=1.26.0
+starlette>=0.32.0

@@ -13,6 +13,7 @@ from fastapi import FastAPI, Request, UploadFile, File, HTTPException, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 from utils.data_processing import (
     load_file,
@@ -36,6 +37,9 @@ app = FastAPI(
     description="Web-based analytics dashboard for data visualization",
     version="1.0.0",
 )
+
+# Add HTTPS redirect middleware
+app.add_middleware(HTTPSRedirectMiddleware)
 
 # Mount static files
 app.mount(
