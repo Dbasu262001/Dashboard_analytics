@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Analytics Dashboard{% endblock %}
+
+{% block extra_head %}
+<script src="{{ url_for('static', path='js/chart.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Success Toast Trigger -->
+{% if upload_success %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        showToast('File uploaded successfully! Your data is ready for analysis.', 'success');
+    });
+</script>
+{% endif %}
+
+<!-- Dashboard Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="fw-bold mb-1">
+            <i class="bi bi-speedometer2 text-primary me-2"></i>Dashboard
+        </h1>
+        <p class="text-muted mb-0">
+            <i class="bi bi-file-earmark-text me-1"></i>
+            Analyzing: <strong>{{ filename }}</strong>
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/upload" class="btn btn-outline-primary">
+            <i class="bi bi-cloud-upload me-1"></i>New Upload
+        </a>
+        <a href="/export.csv" class="btn btn-success">
+            <i class="bi bi-download me-1"></i>Export CSV
+        </a>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-list-ol"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0 fw-bold">{{ summary.row_count | default(0) }}</h3>
+                        <small class="text-muted">Rows</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-columns-gap"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0 fw-bold">{{ summary.column_count | default(0) }}</h3>
+                        <small class="text-muted">Columns</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-123"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0 fw-bold">{{ column_types.numeric | length }}</h3>
+                        <small class="text-muted">Numeric Cols</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0 fw-bold">{{ column_types.datetime | length }}</h3>
+                        <small class="text-muted">Date Cols</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Column Details -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent border-bottom">
+        <h5 class="mb-0"><i class="bi bi-table me-2"></i>Column Details</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Non-Null</th>
+                        <th>Null Count</th>
+                        <th>Stats</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for col in summary.columns %}
+                    <tr>
+                        <td><code>{{ col.name }}</code></td>
+                        <td><span class="badge bg-secondary">{{ col.dtype }}</span></td>
+                        <td>{{ col.non_null_count }}</td>
+                        <td>
+                            {% if col.null_count > 0 %}
+                            <span class="text-warning">{{ col.null_count }}</span>
+                            {% else %}
+                            <span class="text-success">0</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if col.min is defined and col.min is not none %}
+                            <small>
+                                Min: {{ "%.2f"|format(col.min) }} | 
+                                Max: {{ "%.2f"|format(col.max) }} | 
+                                Mean: {{ "%.2f"|format(col.mean) }}
+                            </small>
+                            {% elif col.unique_count is defined %}
+                            <small>{{ col.unique_count }} unique values</small>
+                            {% else %}
+                            <small class="text-muted">-</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row g-4">
+    <!-- Bar Chart -->
+    <div class="col-lg-6">
+        <div class="card chart-card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Bar Chart</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Select Column</label>
+                    <select id="barColumn" class="form-select">
+                        <option value="">Choose a column...</option>
+                        {% for col in column_types.categorical %}
+                        <option value="{{ col }}">{{ col }}</option>
+                        {% endfor %}
+                        {% for col in column_types.numeric %}
+                        <option value="{{ col }}">{{ col }} (numeric)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div id="barChartEmpty" class="chart-empty text-center py-5">
+                    <i class="bi bi-bar-chart display-4 text-muted"></i>
+                    <p class="text-muted mt-2">Select a column to view distribution</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="col-lg-6">
+        <div class="card chart-card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Pie Chart</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Select Column</label>
+                    <select id="pieColumn" class="form-select">
+                        <option value="">Choose a column...</option>
+                        {% for col in column_types.categorical %}
+                        <option value="{{ col }}">{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
+                <div id="pieChartEmpty" class="chart-empty text-center py-5">
+                    <i class="bi bi-pie-chart display-4 text-muted"></i>
+                    <p class="text-muted mt-2">Select a column to view distribution</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Chart (Full Width) -->
+    <div class="col-12">
+        <div class="card chart-card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Time Series / Line Chart</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Date Column</label>
+                        <select id="lineDateCol" class="form-select">
+                            <option value="">Choose date column...</option>
+                            {% for col in column_types.datetime %}
+                            <option value="{{ col }}">{{ col }}</option>
+                            {% endfor %}
+                            {% for col in column_types.categorical %}
+                            <option value="{{ col }}">{{ col }} (try as date)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Value Column</label>
+                        <select id="lineValueCol" class="form-select">
+                            <option value="">Choose value column...</option>
+                            {% for col in column_types.numeric %}
+                            <option value="{{ col }}">{{ col }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Aggregation</label>
+                        <select id="lineAgg" class="form-select">
+                            <option value="sum">Sum</option>
+                            <option value="avg">Average</option>
+                            <option value="count">Count</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="renderLineBtn" class="btn btn-primary mb-3" disabled>
+                    <i class="bi bi-graph-up me-1"></i>Generate Chart
+                </button>
+                <div class="chart-container-lg">
+                    <canvas id="lineChart"></canvas>
+                </div>
+                <div id="lineChartEmpty" class="chart-empty text-center py-5">
+                    <i class="bi bi-graph-up display-4 text-muted"></i>
+                    <p class="text-muted mt-2">Select date and value columns to view time series</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', path='js/dashboard.js') }}"></script>
+{% endblock %}

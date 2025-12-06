@@ -1,0 +1,301 @@
+/* ========================================
+   Analytics Dashboard - Custom Styles
+   ======================================== */
+
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --card-bg: rgba(33, 37, 41, 0.95);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ========== Body & Layout ========== */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background-attachment: fixed;
+}
+
+main {
+  flex: 1;
+}
+
+/* ========== Cards ========== */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card-header {
+  border-radius: 16px 16px 0 0 !important;
+}
+
+/* ========== Stat Cards ========== */
+.stat-card {
+  background: linear-gradient(
+    145deg,
+    rgba(33, 37, 41, 0.9),
+    rgba(40, 44, 52, 0.9)
+  );
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* ========== Upload Page ========== */
+.upload-icon-wrapper {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.upload-card {
+  background: var(--card-bg);
+  border-radius: 24px;
+}
+
+.upload-zone {
+  border: 2px dashed rgba(102, 126, 234, 0.5);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.15);
+  transform: scale(1.01);
+}
+
+.upload-zone.d-none {
+  display: none !important;
+}
+
+.file-info {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== Charts ========== */
+.chart-card {
+  min-height: 400px;
+}
+
+.chart-container {
+  position: relative;
+  height: 280px;
+}
+
+.chart-container-lg {
+  position: relative;
+  height: 350px;
+}
+
+.chart-empty {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+canvas {
+  max-width: 100%;
+}
+
+/* ========== Tables ========== */
+.table {
+  margin-bottom: 0;
+}
+
+.table code {
+  color: #a8d8ff;
+  background: rgba(102, 126, 234, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ========== Form Controls ========== */
+.form-select,
+.form-control {
+  background-color: rgba(33, 37, 41, 0.8);
+  border-color: var(--border-color);
+  color: #fff;
+}
+
+.form-select:focus,
+.form-control:focus {
+  background-color: rgba(33, 37, 41, 0.95);
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+  color: #fff;
+}
+
+.form-select option {
+  background-color: #212529;
+}
+
+/* ========== Buttons ========== */
+.btn-primary {
+  background: var(--primary-gradient);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+  transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.btn-outline-primary:hover {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+/* ========== Badges ========== */
+.badge {
+  font-weight: 500;
+  padding: 0.4em 0.8em;
+}
+
+/* ========== Navbar ========== */
+.navbar {
+  backdrop-filter: blur(10px);
+  background: rgba(33, 37, 41, 0.95) !important;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+}
+
+/* ========== Footer ========== */
+.footer {
+  background: rgba(33, 37, 41, 0.95) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .upload-zone {
+    padding: 2rem 1rem;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .stat-card h3 {
+    font-size: 1.5rem;
+  }
+
+  .chart-container,
+  .chart-container-lg {
+    height: 250px;
+  }
+}
+
+/* ========== Progress Bar ========== */
+.progress {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: var(--primary-gradient);
+}
+
+/* ========== Animations ========== */
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ========== Toast Customization ========== */
+.toast {
+  border-radius: 12px;
+}
+
+.toast-header {
+  border-radius: 12px 12px 0 0;
+}
+
+/* ========== Loading Spinner ========== */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  z-index: 10;
+}
+
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.7);
+}

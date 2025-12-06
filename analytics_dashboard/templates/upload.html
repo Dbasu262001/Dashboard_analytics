@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Data - Analytics Dashboard{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <div class="upload-icon-wrapper mb-4">
+                <i class="bi bi-cloud-arrow-up display-1 text-primary"></i>
+            </div>
+            <h1 class="fw-bold mb-3">Upload Your Data</h1>
+            <p class="text-muted lead">
+                Upload a CSV or Excel file to start analyzing your data.
+                Maximum file size: {{ max_size_mb }}MB
+            </p>
+        </div>
+
+        <!-- Error Alert -->
+        {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endif %}
+
+        <!-- Upload Card -->
+        <div class="card upload-card border-0 shadow-lg">
+            <div class="card-body p-5">
+                <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                    <!-- Drag & Drop Zone -->
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-zone-content">
+                            <i class="bi bi-file-earmark-spreadsheet display-4 text-primary mb-3"></i>
+                            <h5 class="mb-2">Drag & drop your file here</h5>
+                            <p class="text-muted mb-3">or click to browse</p>
+                            <input type="file" 
+                                   id="fileInput" 
+                                   name="file" 
+                                   class="d-none" 
+                                   accept=".csv,.xlsx,.xls"
+                                   required>
+                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">
+                                <i class="bi bi-folder2-open me-2"></i>Browse Files
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- File Info Display -->
+                    <div id="fileInfo" class="file-info mt-4 d-none">
+                        <div class="d-flex align-items-center p-3 bg-dark rounded border border-secondary">
+                            <i class="bi bi-file-earmark-check fs-3 text-success me-3"></i>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0" id="fileName">filename.csv</h6>
+                                <small class="text-muted" id="fileSize">0 KB</small>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearFile()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div id="progressWrapper" class="mt-4 d-none">
+                        <div class="progress" style="height: 8px;">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted mt-2 d-block text-center">Uploading...</small>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                            <i class="bi bi-upload me-2"></i>Upload & Analyze
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Supported Formats -->
+        <div class="text-center mt-4">
+            <p class="text-muted mb-2">Supported formats:</p>
+            <div class="d-flex justify-content-center gap-3">
+                {% for ext in allowed_extensions %}
+                <span class="badge bg-secondary px-3 py-2">
+                    <i class="bi bi-file-earmark me-1"></i>{{ ext }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const MAX_SIZE = {{ max_size_mb }} * 1024 * 1024;
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const submitBtn = document.getElementById('submitBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const progressWrapper = document.getElementById('progressWrapper');
+    const progressBar = document.getElementById('progressBar');
+
+    // Drag and drop handlers
+    uploadZone.addEventListener('click', () => fileInput.click());
+    
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length) {
+            fileInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+
+    // File input change handler
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+
+    function handleFileSelect(file) {
+        // Validate file type
+        const validTypes = ['.csv', '.xlsx', '.xls'];
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        
+        if (!validTypes.includes(ext)) {
+            showToast('Invalid file type. Please upload CSV or Excel files.', 'error');
+            clearFile();
+            return;
+        }
+        
+        // Validate file size
+        if (file.size > MAX_SIZE) {
+            showToast(`File too large. Maximum size is {{ max_size_mb }}MB.`, 'error');
+            clearFile();
+            return;
+        }
+        
+        // Display file info
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.classList.remove('d-none');
+        uploadZone.classList.add('d-none');
+        submitBtn.disabled = false;
+    }
+
+    function clearFile() {
+        fileInput.value = '';
+        fileInfo.classList.add('d-none');
+        uploadZone.classList.remove('d-none');
+        submitBtn.disabled = true;
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    // Form submit handler with progress
+    uploadForm.addEventListener('submit', (e) => {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        progressWrapper.classList.remove('d-none');
+        
+        // Simulate progress for visual feedback
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 10;
+            if (progress > 90) {
+                clearInterval(interval);
+                progress = 90;
+            }
+            progressBar.style.width = progress + '%';
+        }, 200);
+    });
+</script>
+{% endblock %}

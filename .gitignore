@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+# Virtual environment
+venv/
+# Environment files
+.env
+# Ignore OS files
+.DS_Store
+# Ignore IDE files
+.idea/
+.vscode/
+# Ignore analytics_dashboard data folder contents (keep .gitignore)
+analytics_dashboard/data/*
+!analytics_dashboard/data/.gitignore
