@@ -225,6 +225,31 @@ async def numpy_basics(request: Request):
     return templates.TemplateResponse("numpy_basics.html", {"request": request})
 
 
+@app.get("/survey", response_class=HTMLResponse)
+async def survey_page(request: Request):
+    """Render the survey page."""
+    return templates.TemplateResponse("survey.html", {"request": request})
+
+
+@app.post("/survey", response_class=HTMLResponse)
+async def submit_survey(request: Request):
+    """Handle survey form submission."""
+    form = await request.form()
+    name = form.get("name")
+    email = form.get("email")
+    experience = form.get("experience")
+    comments = form.get("comments")
+    # For demo: just show a thank you message, could save to DB/file
+    return templates.TemplateResponse(
+        "survey.html",
+        {
+            "request": request,
+            "thank_you": True,
+            "name": name,
+        },
+    )
+
+
 # ============== API Routes ==============
 
 
