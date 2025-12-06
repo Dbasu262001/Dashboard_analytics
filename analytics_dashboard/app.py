@@ -219,6 +219,12 @@ async def export_csv():
     )
 
 
+@app.get("/numpy-basics", response_class=HTMLResponse)
+async def numpy_basics(request: Request):
+    """Display the NumPy basics page."""
+    return templates.TemplateResponse("numpy_basics.html", {"request": request})
+
+
 # ============== API Routes ==============
 
 
