@@ -22,7 +22,7 @@ jobs:
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12" # use a supported version
+          python-version: "3.11" # use a supported version
 
       # 🛠️ Local Build Section (Optional)
       - name: Create virtual environment and install dependencies
